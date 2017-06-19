@@ -43,7 +43,7 @@ object Wordy {
 
   val ws = P( " ".rep(1) )
 
-  val number: Parser[Number] = P( CharIn('0' to '9').rep(1).!.map(digits => Number(digits.toDouble)) )
+  val number: Parser[Number] = P( "-".? ~ CharIn('0' to '9').rep(1)).!.map(digits => Number(digits.toDouble))
 
   val addition: Parser[Addition.type] = P( "plus" ).!.map(_ => Addition)
   val subtraction: Parser[Subtraction.type] = P( "minus" ).!.map(_ => Subtraction)
@@ -51,7 +51,6 @@ object Wordy {
 
   val expression: Parser[Expression] = P ( factor ~ P ( ws ~ addSub ~ ws ~ factor ).rep() )
     .map { case (lhs, rhs) => rhs.foldLeft(lhs: Expression){ case (acc, (op, expr)) => BinOpExpr(acc, op, expr) } }
-
 
   val division: Parser[Division.type] = P( "divided by" ).!.map(_ => Division)
   val multiplication: Parser[Multiplication.type] = P( "multiplied by" ).!.map(_ => Multiplication)
