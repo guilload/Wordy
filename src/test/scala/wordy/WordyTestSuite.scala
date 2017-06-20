@@ -28,6 +28,7 @@ class WordyTestSuite extends FunSuite {
     assert(Wordy.expression.parse("0 plus 1") === Parsed.Success(BinOpExpr(Number(0f), Addition, Number(1f)), 8))
     assert(Wordy.expression.parse("0 plus 1 plus 2") === Parsed.Success(BinOpExpr(BinOpExpr(Number(0f), Addition, Number(1f)), Addition, Number(2f)), 15))
     assert(Wordy.expression.parse("1 plus 2 multiplied by -3") === Parsed.Success(BinOpExpr(Number(1f), Addition, BinOpExpr(Number(2f), Multiplication, Number(-3f))), 25))
+    assert(Wordy.expression.parse("1 plus 2 multiplied by -3 raised to the power of 2") === Parsed.Success(BinOpExpr(Number(1f), Addition, BinOpExpr(Number(2f), Multiplication, BinOpExpr(Number(-3f), Exponentiation, Number(2f)))), 50))
   }
 
   test("eval expression") {

@@ -20,6 +20,7 @@ case class BinOpExpr(lhs: Expression, operator: Operator, rhs: Expression) exten
 
     val f: BinOp = operator match {
       case Addition => _ + _
+      case Exponentiation => math.pow
       case Division => _ / _
       case Multiplication => _ * _
       case Subtraction => _ - _
@@ -35,6 +36,7 @@ sealed trait Operator
 
 case object Addition extends Operator
 case object Division extends Operator
+case object Exponentiation extends Operator
 case object Multiplication extends Operator
 case object Subtraction extends Operator
 
@@ -56,7 +58,12 @@ object Wordy {
   val multiplication: Parser[Multiplication.type] = P( "multiplied by" ).!.map(_ => Multiplication)
   val divMul: Parser[Operator] = P ( division | multiplication )
 
-  val factor: Parser[Expression] = P ( number ~ P ( ws ~ divMul ~ ws ~ number ).rep() )
+  val factor: Parser[Expression] = P ( power ~ P ( ws ~ divMul ~ ws ~ power ).rep() )
+    .map { case (lhs, rhs) => rhs.foldLeft(lhs: Expression){ case (acc, (op, expr)) => BinOpExpr(acc, op, expr) } }
+
+  val exponentiation: Parser[Exponentiation.type] = P( "raised to the power of" ).!.map(_ => Exponentiation)
+
+  val power: Parser[Expression] = P ( number ~ P ( ws ~ exponentiation ~ ws ~ number).rep() )
     .map { case (lhs, rhs) => rhs.foldLeft(lhs: Expression){ case (acc, (op, expr)) => BinOpExpr(acc, op, expr) } }
 
   val qMark: Parser[Unit] = P( "?" ~ End )
